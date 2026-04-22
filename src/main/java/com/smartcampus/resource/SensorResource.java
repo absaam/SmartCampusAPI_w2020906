@@ -16,30 +16,30 @@ public class SensorResource {
     // Get all sensors - can filter by type using ?type=CO2
     @GET
     public Response getAllSensors(@QueryParam("type") String type) {
-        List<Sensor> sensorList = new ArrayList<>(DataStore.getSensors().values());
+        List<Sensor> allSensors = new ArrayList<>(DataStore.getSensors().values());
         if (type != null && !type.isEmpty()) {
-            List<Sensor> filtered = new ArrayList<>();
-            for (Sensor s : sensorList) {
+            List<Sensor> matchingSensors = new ArrayList<>();
+            for (Sensor s : allSensors) {
                 if (s.getType().equalsIgnoreCase(type)) {
-                    filtered.add(s);
+                    matchingSensors.add(s);
                 }
             }
-            return Response.ok(filtered).build();
+            return Response.ok(matchingSensors).build();
         }
-        return Response.ok(sensorList).build();
+        return Response.ok(allSensors).build();
     }
 
     // Get one sensor by ID
     @GET
     @Path("{sensorId}")
     public Response getSensor(@PathParam("sensorId") String sensorId) {
-        Sensor sensor = DataStore.getSensors().get(sensorId);
-        if (sensor == null) {
+        Sensor foundSensor = DataStore.getSensors().get(sensorId);
+        if (foundSensor == null) {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\":\"Sensor not found\"}")
+                    .entity("{\"error\":\"No sensor found with that ID\"}")
                     .build();
         }
-        return Response.ok(sensor).build();
+        return Response.ok(foundSensor).build();
     }
 
     // Add a new sensor - checks the room exists first
@@ -47,12 +47,12 @@ public class SensorResource {
     public Response createSensor(Sensor sensor) {
         if (!DataStore.getRooms().containsKey(sensor.getRoomId())) {
             return Response.status(422)
-                    .entity("{\"error\":\"Room not found for given roomId\"}")
+                    .entity("{\"error\":\"The roomId provided does not match any existing room\"}")
                     .build();
         }
         if (DataStore.getSensors().containsKey(sensor.getId())) {
             return Response.status(Response.Status.CONFLICT)
-                    .entity("{\"error\":\"Sensor already exists\"}")
+                    .entity("{\"error\":\"A sensor with this ID already exists\"}")
                     .build();
         }
         DataStore.getSensors().put(sensor.getId(), sensor);

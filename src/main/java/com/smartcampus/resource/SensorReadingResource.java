@@ -22,35 +22,35 @@ public class SensorReadingResource {
     // Get all readings for this sensor
     @GET
     public Response getReadings() {
-        Sensor sensor = DataStore.getSensors().get(sensorId);
-        if (sensor == null) {
+        Sensor foundSensor = DataStore.getSensors().get(sensorId);
+        if (foundSensor == null) {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\":\"Sensor not found\"}")
+                    .entity("{\"error\":\"No sensor found with that ID\"}")
                     .build();
         }
-        List<SensorReading> readings = DataStore.getReadings()
+        List<SensorReading> sensorReadings = DataStore.getReadings()
                 .getOrDefault(sensorId, new ArrayList<>());
-        return Response.ok(readings).build();
+        return Response.ok(sensorReadings).build();
     }
 
     // Add a new reading - blocked if sensor is under maintenance
     @POST
     public Response addReading(SensorReading reading) {
-        Sensor sensor = DataStore.getSensors().get(sensorId);
-        if (sensor == null) {
+        Sensor foundSensor = DataStore.getSensors().get(sensorId);
+        if (foundSensor == null) {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("{\"error\":\"Sensor not found\"}")
+                    .entity("{\"error\":\"No sensor found with that ID\"}")
                     .build();
         }
-        if (sensor.getStatus().equalsIgnoreCase("MAINTENANCE")) {
+        if (foundSensor.getStatus().equalsIgnoreCase("MAINTENANCE")) {
             return Response.status(Response.Status.FORBIDDEN)
-                    .entity("{\"error\":\"Sensor is under maintenance\"}")
+                    .entity("{\"error\":\"This sensor is currently under maintenance and cannot record readings\"}")
                     .build();
         }
         // Save reading and update the sensor's current value
         SensorReading newReading = new SensorReading(reading.getValue());
         DataStore.getReadings().get(sensorId).add(newReading);
-        sensor.setCurrentValue(reading.getValue());
+        foundSensor.setCurrentValue(reading.getValue());
         return Response.status(Response.Status.CREATED).entity(newReading).build();
     }
 }
