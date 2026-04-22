@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class SensorResource {
 
-    // GET /api/v1/sensors - get all sensors (with optional type filter)
+    // Get all sensors - can filter by type using ?type=CO2
     @GET
     public Response getAllSensors(@QueryParam("type") String type) {
         List<Sensor> sensorList = new ArrayList<>(DataStore.getSensors().values());
@@ -29,7 +29,7 @@ public class SensorResource {
         return Response.ok(sensorList).build();
     }
 
-    // GET /api/v1/sensors/{sensorId} - get a specific sensor
+    // Get one sensor by ID
     @GET
     @Path("{sensorId}")
     public Response getSensor(@PathParam("sensorId") String sensorId) {
@@ -42,7 +42,7 @@ public class SensorResource {
         return Response.ok(sensor).build();
     }
 
-    // POST /api/v1/sensors - create a new sensor
+    // Add a new sensor - checks the room exists first
     @POST
     public Response createSensor(Sensor sensor) {
         if (!DataStore.getRooms().containsKey(sensor.getRoomId())) {
@@ -61,7 +61,7 @@ public class SensorResource {
         return Response.status(Response.Status.CREATED).entity(sensor).build();
     }
 
-    // Sub-resource locator for readings
+    // Links to the readings for a specific sensor
     @Path("{sensorId}/readings")
     public SensorReadingResource getReadingResource(@PathParam("sensorId") String sensorId) {
         return new SensorReadingResource(sensorId);

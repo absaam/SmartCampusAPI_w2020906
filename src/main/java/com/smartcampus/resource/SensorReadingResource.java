@@ -19,7 +19,7 @@ public class SensorReadingResource {
         this.sensorId = sensorId;
     }
 
-    // GET /api/v1/sensors/{sensorId}/readings - get all readings for a sensor
+    // Get all readings for this sensor
     @GET
     public Response getReadings() {
         Sensor sensor = DataStore.getSensors().get(sensorId);
@@ -33,7 +33,7 @@ public class SensorReadingResource {
         return Response.ok(readings).build();
     }
 
-    // POST /api/v1/sensors/{sensorId}/readings - add a new reading
+    // Add a new reading - blocked if sensor is under maintenance
     @POST
     public Response addReading(SensorReading reading) {
         Sensor sensor = DataStore.getSensors().get(sensorId);
@@ -44,9 +44,10 @@ public class SensorReadingResource {
         }
         if (sensor.getStatus().equalsIgnoreCase("MAINTENANCE")) {
             return Response.status(Response.Status.FORBIDDEN)
-                    .entity("{\"error\":\"Sensor is under maintenance and cannot accept readings\"}")
+                    .entity("{\"error\":\"Sensor is under maintenance\"}")
                     .build();
         }
+        // Save reading and update the sensor's current value
         SensorReading newReading = new SensorReading(reading.getValue());
         DataStore.getReadings().get(sensorId).add(newReading);
         sensor.setCurrentValue(reading.getValue());

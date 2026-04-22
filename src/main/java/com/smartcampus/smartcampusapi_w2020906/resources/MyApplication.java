@@ -13,20 +13,28 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
+// Entry point for the API - all requests go through /api/v1
 @ApplicationPath("api/v1")
 public class MyApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<>();
+
+        // Register resource endpoints
         classes.add(DiscoveryResource.class);
         classes.add(RoomResource.class);
         classes.add(SensorResource.class);
+
+        // Register error handlers
         classes.add(RoomNotEmptyExceptionMapper.class);
         classes.add(LinkedResourceNotFoundExceptionMapper.class);
         classes.add(SensorUnavailableExceptionMapper.class);
         classes.add(GlobalExceptionMapper.class);
+
+        // Register logging filter
         classes.add(LoggingFilter.class);
+
         return classes;
     }
 }
