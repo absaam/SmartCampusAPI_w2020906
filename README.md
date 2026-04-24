@@ -34,9 +34,9 @@ curl -X GET http://localhost:8080/SmartCampusAPI_w2020906/api/v1/rooms/WEST-101
 
 curl -X GET http://localhost:8080/SmartCampusAPI_w2020906/api/v1/sensors
 
-**Get a specific sensor**
+**(DELETE) Remove a room**
 
-curl -X GET http://localhost:8080/SmartCampusAPI_w2020906/api/v1/sensors/CO2-W01
+curl -X DELETE http://localhost:8080/SmartCampusAPI_w2020906/api/v1/rooms/WEST-101
 
 **(POST)Create a new room**
 curl -X POST http://localhost:8080/SmartCampusAPI_w2020906/api/v1/rooms \
